@@ -3,7 +3,8 @@ from time import sleep
 
 with sync_playwright() as playwright:
     browser = playwright.chromium.launch(headless=False)
-    page = browser.new_page()
+    context = browser.new_context(storage_state='browser-state.json')
+    page = context.new_page()
     page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration")
 
     registration_email_input = page.get_by_test_id('registration-form-email-input').locator('input')
@@ -19,6 +20,9 @@ with sync_playwright() as playwright:
     registration_button.click()
 
     dashboard_title = page.get_by_test_id('dashboard-toolbar-title-text')
+
+    context.storage_state(path='browser-state.json')
+
 
 
     expect(dashboard_title).to_be_visible()
