@@ -2,11 +2,11 @@ import pytest
 from playwright.sync_api import sync_playwright, expect, Playwright, Page
 
 @pytest.fixture(scope='session')
-def initialize_browser_state(playwright: Playwright) -> Page:
+def initialize_browser_state(playwright: Playwright):
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context()
     page = context.new_page()
-    yield page
+    page.goto("https://nikita-filonov.github.io/qa-automation-engineer-ui-course/#/auth/registration")
 
     registration_email_input = page.get_by_test_id('registration-form-email-input').locator('input')
     registration_email_input.fill('user.name@gmail.com')
@@ -22,13 +22,13 @@ def initialize_browser_state(playwright: Playwright) -> Page:
 
     context.storage_state(path='browser-state.json')
     print("[FIXTURE] Контекст сохранился")
-
-
     browser.close()
 
 
+
+
 @pytest.fixture(autouse=True, scope='function')
-def chromium_page_with_state(playwright: Playwright) -> Page:
+def chromium_page_with_state(initialize_browser_state, playwright: Playwright) -> Page:
     browser = playwright.chromium.launch(headless=False)
     context = browser.new_context(storage_state="browser-state.json")
     print("[FIXTURE] Использование контекста")
